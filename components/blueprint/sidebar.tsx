@@ -1,8 +1,8 @@
 "use client";
 
-import { Briefcase, LayoutList, BarChart2, Share, RefreshCw, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { Briefcase, LayoutList, BarChart2, Crosshair, Share, RefreshCw, ChevronsLeft, ChevronsRight } from "lucide-react";
 
-type ActiveTab = "brd" | "prd" | "market";
+type ActiveTab = "brd" | "prd" | "market" | "competitor";
 
 interface SidebarProps {
   activeTab: ActiveTab;
@@ -17,6 +17,7 @@ const TABS = [
   { id: "brd" as const, icon: Briefcase, label: "Business case" },
   { id: "prd" as const, icon: LayoutList, label: "Product specs" },
   { id: "market" as const, icon: BarChart2, label: "Market intel" },
+  { id: "competitor" as const, icon: Crosshair, label: "Competitor deep-dive" },
 ] as const;
 
 export function Sidebar({

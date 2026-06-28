@@ -1,6 +1,7 @@
 import { generateObject } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { blueprintResultSchema } from "@/lib/schemas";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
   const { ideaInput, targetAudience, monetisationModel, competitors } =
@@ -74,5 +75,29 @@ Market Analysis:
   plain integer string (e.g. "6").`,
   });
 
-  return Response.json(object);
+  // Persist the blueprint if the user is authenticated
+  let blueprintId: string | null = null;
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: row } = await supabase
+        .from("blueprints")
+        .insert({
+          user_id: user.id,
+          title: ideaInput.slice(0, 60),
+          idea_input: ideaInput,
+          brd: object.brd.markdown,
+          prd: object.prd.markdown,
+          market: object.market.markdown,
+        })
+        .select("id")
+        .single();
+      blueprintId = row?.id ?? null;
+    }
+  } catch {
+    // Non-fatal — blueprint is still returned to the client even if save fails
+  }
+
+  return Response.json({ ...object, blueprintId });
 }
